@@ -1,0 +1,20 @@
+[
+    {
+        "id": "M001",
+        "name": "Kasun",
+        "address": "Panadura",
+        "contact": "071-1472589"
+    },
+    {
+        "id": "M002",
+        "name": "Nisal",
+        "address": "Galle",
+        "contact": "071-1472589"
+    },
+    {
+        "id": "M003",
+        "name": "Pathum",
+        "address": "Matara",
+        "contact": "071-1472589"
+    }
+]
