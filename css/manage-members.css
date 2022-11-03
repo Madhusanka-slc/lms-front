@@ -1,0 +1,158 @@
+header {
+  position: relative;
+}
+header h3 ion-icon {
+  vertical-align: middle;
+  padding-right: 10px;
+}
+header a {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  font-size: 2.5rem;
+}
+
+#tbl-members th:first-child,
+#tbl-members tbody td:first-child {
+  max-width: 170px;
+  min-width: 110px;
+  word-break: keep-all;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: left;
+}
+#tbl-members th:nth-child(2),
+#tbl-members tbody td:nth-child(2) {
+  width: 250px;
+}
+#tbl-members th:last-child,
+#tbl-members tbody td:last-child {
+  width: 150px;
+  text-align: center;
+}
+#tbl-members.empty tfoot {
+  display: table-footer-group;
+}
+#tbl-members tfoot {
+  display: none;
+}
+#tbl-members tbody tr:focus {
+  background-color: rgb(155, 155, 14);
+}
+
+#loader {
+  display: flex;
+  justify-content: center;
+}
+#loader .lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+#loader .lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid rgb(12, 37, 41);
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: rgb(42, 109, 121) transparent transparent transparent;
+}
+#loader .lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+#loader .lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+#loader .lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#frm-member-detail .btn ion-icon {
+  font-size: 1.3em;
+  vertical-align: sub;
+}
+#frm-member-detail.new #btn-edit, #frm-member-detail.new #edit-buttons-wrapper {
+  display: none;
+}
+#frm-member-detail.new #btn-save {
+  display: inline !important;
+}
+#frm-member-detail.new .modal-body form > div:first-child {
+  display: none;
+}
+#frm-member-detail.edit #btn-edit, #frm-member-detail.edit #btn-save {
+  display: none;
+}
+#frm-member-detail.edit #edit-buttons-wrapper {
+  display: block !important;
+}
+#frm-member-detail.edit #edit-buttons-wrapper ion-icon {
+  padding-right: 5px;
+}
+
+#overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(95, 100, 102, 0.726);
+  z-index: 9999;
+}
+#overlay h2 {
+  color: #fff;
+}
+
+#overlay-loader .lds-facebook {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  transform: scale(2);
+}
+#overlay-loader .lds-facebook div {
+  display: inline-block;
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  background: #fff;
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+#overlay-loader .lds-facebook div:nth-child(1) {
+  left: 8px;
+  animation-delay: -0.24s;
+}
+#overlay-loader .lds-facebook div:nth-child(2) {
+  left: 32px;
+  animation-delay: -0.12s;
+}
+#overlay-loader .lds-facebook div:nth-child(3) {
+  left: 56px;
+  animation-delay: 0;
+}
+@keyframes lds-facebook {
+  0% {
+    top: 8px;
+    height: 64px;
+  }
+  50%, 100% {
+    top: 24px;
+    height: 32px;
+  }
+}
+
+/*# sourceMappingURL=manage-members.css.map */
