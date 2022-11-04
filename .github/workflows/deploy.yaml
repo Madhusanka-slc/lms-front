@@ -30,7 +30,7 @@ jobs:
     - name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v0'
       with:
-        credentials_json: '${{ SERVICE_ACCOUNT_PRIVATE_KEY }}'
+        credentials_json: '${{ SERVICE_ACCOUNT_PRIVATE_KEY }}' 
 
     - name: 'Seting up gcloud'
       uses: 'google-github-actions/setup-gcloud@v0'
@@ -50,12 +50,14 @@ jobs:
     - name: Extracting the zip
       run: >
         gcloud compute ssh --zone="asia-south1-a" dep-9-vm 
-         --command="sudo unzip /opt/apache/apache-tomcat-10.1.1/webapps/lms/dist.zip /opt/apache/apache-tomcat-10.1.1/webapps/lms/"
+         --command="sudo unzip /opt/apache/apache-tomcat-10.1.1/webapps/lms/dist.zip -d /opt/apache/apache-tomcat-10.1.1/webapps/lms/"
 
     - name: Cleaning left overs
       run: >
         gcloud compute ssh --zone="asia-south1-a" dep-9-vm 
          --command="sudo rm /opt/apache/apache-tomcat-10.1.1/webapps/lms/dist.zip"
+
+
 
 
 
