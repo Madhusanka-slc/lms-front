@@ -42,4 +42,7 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
+
+      - name: Deploy the dist.zip
+        run: gcloud compute scp dist.zip dep-9-vm:/opt
        
