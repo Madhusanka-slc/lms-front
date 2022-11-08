@@ -16,6 +16,7 @@ function getBooks(query=`${$('#txt-search').val()}`){
             if (http.status === 200){
                 const totalBooks = +http.getResponseHeader('X-Total-Count');
                 initPagination(totalBooks);
+                console.log(http.responseText);
 
                 const books = JSON.parse(http.responseText);
                 if (books.length === 0){
