@@ -56,7 +56,7 @@ jobs:
       run: >
         gcloud compute ssh --zone="asia-south1-a" dep-9-vm 
         --command="sudo rm /opt/apache/apache-tomcat-10.1.1/webapps/lms/dist.zip"
-#
+
 
 
 
