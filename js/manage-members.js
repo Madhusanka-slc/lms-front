@@ -206,6 +206,7 @@ function saveMember(){
             contact: $("#txt-contact").val()
             
         }
+        
 
         xhr.send(JSON.stringify(member));
 
