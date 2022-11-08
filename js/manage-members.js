@@ -1,4 +1,4 @@
-const API_END_POINT='http://34.100.155.118:8080/lms/api';
+const API_END_POINT='http://35.200.162.107:8080/lms/api';
 const pageSize = 8;
 let page = 1;
 
