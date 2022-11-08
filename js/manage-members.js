@@ -16,6 +16,7 @@ function getMembers(query=`${$('#txt-search').val()}`){
             if (http.status === 200){
                 const totalMembers = +http.getResponseHeader('X-Total-Count');
                 initPagination(totalMembers);
+                console.log(http.responseText);
 
                 const members = JSON.parse(http.responseText);
                 if (members.length === 0){
