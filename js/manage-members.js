@@ -245,7 +245,7 @@ $('#tbl-members tbody').click(({target})=>{
  
     if(!target) return;
     // let rowElm=null;
-    let rowElm=target.closest('tr');;
+    let rowElm=target.closest('tr');
 
     // if(target instanceof HTMLTableRowElement ){
     //     rowElm=target;
@@ -256,7 +256,8 @@ $('#tbl-members tbody').click(({target})=>{
     //     return;
     // }
   
-    // console.log($(rowElm.cells[0].innerText));
+    console.log($(rowElm.cells[0]).text());
+
     getMemberDetails($(rowElm.cells[0]).text());
 });
 
