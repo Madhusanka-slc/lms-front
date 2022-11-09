@@ -16,7 +16,6 @@ function getBooks(query=`${$('#txt-search').val()}`){
             if (http.status === 200){
                 const totalBooks = +http.getResponseHeader('X-Total-Count');
                 initPagination(totalBooks);
-                console.log(http.responseText);
 
                 const books = JSON.parse(http.responseText);
                 if (books.length === 0){
@@ -37,7 +36,7 @@ function getBooks(query=`${$('#txt-search').val()}`){
                     $('#tbl-books tbody').append(rowHtml);
                 });
             }else{
-                showToast('Failed to load books, try refreshing again','warning');
+                showToast('Failed to load books, try refreshing again');
             }
         }
     });
@@ -53,11 +52,12 @@ function getBooks(query=`${$('#txt-search').val()}`){
 
 function initPagination(totalBooks){
     const totalPages = Math.ceil(totalBooks / pageSize);
-    if(page>totalPages){
-       page=totalPages
-       getBooks();
-       return;
-    }        
+    if (page > totalPages) {
+        page = totalPages;
+        if (page === 0) page = 1;
+        getBooks();
+        return;
+    }
     
     if (totalPages <= 1){
         $("#pagination").addClass('d-none');
@@ -113,6 +113,11 @@ $('#tbl-books tbody').keyup((eventData)=>{
         if (elm instanceof HTMLTableRowElement){
             elm.focus();
         }
+    }else if (eventData.which === 13){
+        const elm = document.activeElement;
+        if (elm instanceof HTMLTableRowElement)   {
+            elm.click();
+        }
     }
 });
 
@@ -126,16 +131,18 @@ $("#btn-new-book").click(()=> {
     const frmBookDetail = new 
                 bootstrap.Modal(document.getElementById('frm-book-detail'));
 
+    $("#txt-isbn, #txt-title, #txt-author, #txt-copies").attr('disabled', false).val(''); 
+    $("#txt-copies").val(1);
+
     $("#frm-book-detail")
-    .removeClass('edit')
+        .removeClass('edit')
         .addClass('new')
         .on('shown.bs.modal', ()=> {
-            $('#txt-isbn,#txt-title,#txt-author,#txt-copies').attr('disabled',false).val('');
-            $("#txt-title").focus();
+            setTimeout(()=>
+            $("#txt-isbn").focus(),500);
         });
 
-
-        frmBookDetail.show();
+    frmBookDetail.show();
 });
 
 $("#frm-book-detail form").submit((eventData)=> {
@@ -143,19 +150,17 @@ $("#frm-book-detail form").submit((eventData)=> {
     $("#btn-save").click();
 });
 
-
-
-
 $("#btn-save").click(async ()=> {
 
+    const isbn = $("#txt-isbn").val();
     const title = $("#txt-title").val();
     const author = $("#txt-author").val();
-    const copies = $("#txt-copies").val();
+    const copies = +$("#txt-copies").val();
     let validated = true;
 
-    $("#txt-title, #txt-author, #txt-copies").removeClass('is-invalid');
+    $("#txt-isbn, #txt-title, #txt-author, #txt-copies").removeClass('is-invalid');
 
-    if (!/^\d+$/.test(copies)){
+    if (copies < 1){
         $("#txt-copies").addClass('is-invalid').select().focus();
         validated = false;
     }
@@ -165,8 +170,13 @@ $("#btn-save").click(async ()=> {
         validated = false;
     }
 
-    if (!/^[A-Za-z ]+$/.test(title)){
+    if (!/^.+$/.test(title)){
         $("#txt-title").addClass('is-invalid').select().focus();
+        validated = false;
+    }
+
+    if (!/^([0-9][0-9\\-]*[0-9])$/.test(isbn)){
+        $("#txt-isbn").addClass('is-invalid').select().focus();
         validated = false;
     }
 
@@ -174,21 +184,22 @@ $("#btn-save").click(async ()=> {
 
     try{
         $("#overlay").removeClass("d-none");
-        const {isbn} = await saveBook();
+        await saveBook();
         $("#overlay").addClass("d-none");
-        showToast(`Book has been saved successfully with the ISBN: ${isbn}`, 'success');
-        $("#txt-title, #txt-author, #txt-copies").val("");
-        $("#txt-title").focus();
+        showToast(`Book has been saved successfully`, 'success');
+        $("#txt-isbn, #txt-title, #txt-author, #txt-copies").val("");
+        $("#txt-copies").val(1);
+        $("#txt-isbn").focus();
     }catch(e){
+        console.log(e);
         $("#overlay").addClass("d-none");
-        showToast("Failed to save the book, try again");
-        $("#txt-title").focus();
+        showToast("Failed to save the book, try again", 'error');
+        $("#txt-isbn").focus();
     }
     
 });
 
 function saveBook(){
-    console.log("Hi");
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
@@ -201,25 +212,21 @@ function saveBook(){
                 }
             }
         });
-        console.log("Hee");
 
         xhr.open('POST', `${API_END_POINT}/books`, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        console.log("Hee");
 
         const book = {
+            isbn: $("#txt-isbn").val(),
             title: $("#txt-title").val(),
             author: $("#txt-author").val(),
-            copies: $("#txt-copies").val()
-            
+            copies: +$("#txt-copies").val()
         }
-        console.log("Hee");
 
         xhr.send(JSON.stringify(book));
 
     });
 }
-
 
 function showToast(msg, msgType = 'warning'){
     $("#toast").removeClass('text-bg-warning')
@@ -241,109 +248,95 @@ function showToast(msg, msgType = 'warning'){
     $("#toast").toast('show');
 }
 
-
-
-$('#frm-book-detail').on('hidden.bs.modal',()=>{
+$("#frm-book-detail").on('hidden.bs.modal', ()=> {
     getBooks();
 });
 
-
-$('#tbl-books tbody').click(({target})=>{
- 
-    if(!target) return;
-
-    let rowElm=target.closest('tr');
-    console.log($(rowElm.cells[0]).text());
+$('#tbl-books tbody').click(({target})=> {
+    if (!target) return;
+    let rowElm = target.closest('tr');
+    // if (target instanceof HTMLTableRowElement) {
+    //     rowElm = target;
+    // }else if(target instanceof HTMLTableCellElement){
+    //     rowElm = target.parentElement;
+    // }else{
+    //     return;
+    // }
 
     getBookDetails($(rowElm.cells[0]).text());
-
 });
 
-
-async function getBookDetails(bookId){
-    console.log("Hi");
-
+async function getBookDetails(isbn){
     try{
-        const response=await fetch(`${API_END_POINT}/books/${bookId}`);
-        if(response.ok){
-            const book=await response.json();
-            console.log(book)
+        const response = await fetch(`${API_END_POINT}/books/${isbn}`)
+        if (response.ok){
+            const book = await response.json(); 
+            console.log(book);
+            
+            const frmBookDetail = new 
+            bootstrap.Modal(document.getElementById('frm-book-detail'));
 
-                const frmBookDetail = new  
-                bootstrap.Modal(document.getElementById('frm-book-detail'));
-               
+            $("#frm-book-detail")
+                .removeClass('new').removeClass('edit');
 
+            $("#txt-isbn").attr('disabled', 'true').val(book[0].isbn);
+            $("#txt-title").attr('disabled', 'true').val(book[0].title);
+            $("#txt-author").attr('disabled', 'true').val(book[0].author);
+            $("#txt-copies").attr('disabled', 'true').val(book[0].copies);
 
-                $("#frm-book-detail")
-                .removeClass('new')
-                .removeClass('edit');
-
-                $('#txt-isbn').attr('disabled','true').val(book[0].isbn);
-                $('#txt-title').attr('disabled','true').val(book[0].title);
-                $('#txt-author').attr('disabled','true').val(book[0].author);
-                $('#txt-copies').attr('disabled','true').val(book[0].copies);
-              
-               
-
-                frmBookDetail.show();
-
+            frmBookDetail.show();
         }else{
             throw new Error(response.status);
         }
-
     }catch(error){
         showToast('Failed to fetch the book details');
-
     }
 
 
+
+    // const http = new XMLHttpRequest();
+    // http.addEventListener('readystatechange', ()=> {
+    //     if (http.readyState === XMLHttpRequest.DONE){
+    //         if (http.status === 200){
+    //             const member = JSON.parse(http.responseText);
+
+    //             const frmMemberDetail = new 
+    //             bootstrap.Modal(document.getElementById('frm-member-detail'));
+
+    //             $("#frm-member-detail")
+    //                 .removeClass('new');
+
+    //             $("#txt-id").attr('disabled', 'true').val(member.id);
+    //             $("#txt-name").attr('disabled', 'true').val(member.name);
+    //             $("#txt-address").attr('disabled', 'true').val(member.address);
+    //             $("#txt-contact").attr('disabled', 'true').val(member.contact);
+
+    //             frmMemberDetail.show();
+    //         }else{
+    //             showToast('Failed to fetch the member details');
+    //         }
+    //     }
+    // });
+    // http.open('GET', `${API_END_POINT}/members/${memberId}`, true);
+    // http.send();
 }
 
-
-
-
-
-
-$('#btn-edit').click(()=>{
-    $('#frm-book-detail').addClass('edit');
-    $("#txt-title, #txt-author, #txt-copies").attr("disabled",false);
+$("#btn-edit").click(()=> {
+    $("#frm-book-detail").addClass('edit');
+    $("#txt-title, #txt-author, #txt-copies").attr('disabled', false);
 });
 
-$('#btn-delete').click(async()=>{
-    $('#overlay').removeClass('d-none');
+$("#btn-update").click(async ()=> {
 
-    try{
-        const response=await fetch(`${API_END_POINT}/books/${$('#txt-isbn').val()}`,{method: "DELETE"});
-
-        if(response.status===204){
-            showToast('Book has been deleted successfully','success');
-       
-            $('#btn-close').click();
-
-        }else{
-            throw new Error(response.status);
-        }
-
-    }catch(error){
-        showToast('Failed to delete book, try again');
-
-    }finally{
-        $('#overlay').addClass('d-none');
-    }
-});
-
-
-
-$('#btn-update').click(async()=>{
-
+    const isbn = $("#txt-isbn").val();
     const title = $("#txt-title").val();
     const author = $("#txt-author").val();
-    const copies = $("#txt-copies").val();
+    const copies = +$("#txt-copies").val();
     let validated = true;
 
-    $("#txt-title, #txt-author, #txt-copies").removeClass('is-invalid');
+    $("#txt-isbn, #txt-title, #txt-author, #txt-copies").removeClass('is-invalid');
 
-    if (!/^\d+$/.test(contact)){
+    if (copies < 1){
         $("#txt-copies").addClass('is-invalid').select().focus();
         validated = false;
     }
@@ -353,43 +346,38 @@ $('#btn-update').click(async()=>{
         validated = false;
     }
 
-    if (!/^[A-Za-z ]+$/.test(title)){
+    if (!/^.+$/.test(title)){
         $("#txt-title").addClass('is-invalid').select().focus();
+        validated = false;
+    }
+
+    if (!/^([0-9][0-9\\-]*[0-9])$/.test(isbn)){
+        $("#txt-isbn").addClass('is-invalid').select().focus();
         validated = false;
     }
 
     if (!validated) return;
 
-    $('#overlay').removeClass('d-none');
-
-   try{
-    const response= await fetch(`${API_END_POINT}/books/${$('#txt-isbn').val()}`,
-    {
-        method: "PATCH",
-        headers: {
-            'Content-Type':'application/json'
-        },
-        body: JSON.stringify({
-            id:$('#txt-isbn').val(),
-            title,author,copies
-        })
-
-    });
-    if(response.status===204){
-        showToast("Book has been updated",'success');
-    }else{
-        throw new Error(response.status);
+    $("#overlay").removeClass('d-none');
+    try{
+        const response = await fetch(`${API_END_POINT}/books/${$("#txt-isbn").val()}`, 
+            {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    isbn, title, author, copies
+                })
+            });
+        if (response.status === 204){
+            showToast('Book has been updated successfully', 'success');
+        }else{
+            throw new Error(response.status);
+        }
+    }catch(error){
+        showToast('Failed to update the book, try again!');
+    }finally{
+        $("#overlay").addClass('d-none');
     }
-    
-
-   }catch(error){
-    showToast("Faild to update");
-   }finally{
-    $('#overlay').addClass('d-none');
-   }
- 
-    
 });
-
-
-

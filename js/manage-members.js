@@ -113,6 +113,12 @@ $('#tbl-members tbody').keyup((eventData)=>{
         if (elm instanceof HTMLTableRowElement){
             elm.focus();
         }
+    }else if(eventData.which===13){
+        const elm=document.activeElement;
+        if(elm instanceof HTMLTableRowElement){
+            elm.click();
+        }
+
     }
 });
 
